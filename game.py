@@ -150,12 +150,9 @@ class Game:
         else:
             return False
 
-
-
-
 def main():
     # Start Game
-    from example_player import ExamplePlayer, HumanPlayer
+    from players import ExamplePlayer, HumanPlayer
     p1 = HumanPlayer()
     p2 = HumanPlayer()
     players = [p1, p2]
