@@ -4,7 +4,7 @@ import time
 
 class Game:
 
-    GAME_END = 10000
+    GAME_END = 100000
 
     def __init__(self, players = []):
         shuffle(players)
@@ -153,8 +153,8 @@ class Game:
 def main():
     # Start Game
     from players import ExamplePlayer, HumanPlayer
-    p1 = HumanPlayer()
-    p2 = HumanPlayer()
+    p1 = ExamplePlayer()
+    p2 = ExamplePlayer()
     players = [p1, p2]
     def play_n_games(n):
         results = [0 for i in range(n)]
