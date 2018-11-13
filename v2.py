@@ -1,5 +1,6 @@
 from random import shuffle, randint
 import unittest
+import time
 
 class Game:
 
@@ -23,9 +24,12 @@ class Game:
             self.play_turn(player)
             if self.is_game_over(): break
             self.current_player = self.next_player()
+            #time.sleep(1)
         ranking = self.calculate_ranking()
+        return self.scores
 
     def play_turn(self, player):
+        print(f"******************* NEW TURN: *******************")
         turn_score = 0
         turn_dice = 6
         player.update_state(self.players, self.scores, self.current_player, Game.GAME_END)
@@ -39,8 +43,10 @@ class Game:
         while True:
             # If a roll is a farkle, update state and end turn.
             if self.farkle(roll):
+                print("farkle!")
                 turn_score = 0
                 turn_dice = 6
+                self.update_gamestate(turn_score,turn_dice)
                 break
 
             move = player.decide_move(turn_score, roll)
@@ -50,10 +56,14 @@ class Game:
                 score_dice = self.get_score(roll)
                 turn_score += score_dice[0]
                 turn_dice -= score_dice[1]
+                self.update_gamestate(turn_score,turn_dice)
+                print(f"PLAYER ENDS TURN, turn score is {turn_score}")
                 break
 
             # Continue turn: score the selected dice and roll the rest.
             selected_dice = [a*b for a,b in zip(roll, move)]
+            while 0 in selected_dice: selected_dice.remove(0)
+
             score_dice = self.get_score(selected_dice)
             turn_score += score_dice[0]
             turn_dice -= score_dice[1]
@@ -63,8 +73,7 @@ class Game:
             if turn_dice==0: turn_dice += 6;
             roll = self.roll_dice(turn_dice)
 
-        self.update_gamestate(turn_score,turn_dice)
-        print(f"Turn \#{self.turn_number}: scores are {self.scores}.")
+        print(f"Turn #{self.turn_number}: scores are {self.scores}.")
 
     def add_player(self, player):
         self.players.append(player)
@@ -82,7 +91,6 @@ class Game:
 
     # Calculate best possible score with some roll, returns [score, unscoring dice]
     def get_score(self, roll):
-        #TODO: implement this!
         score = 0
         scoring_dice = 0
         dice_freq = [0 for i in range(6)]
@@ -107,10 +115,12 @@ class Game:
         if dice_freq[4] < 3:
             score += 50 * dice_freq[4]
             scoring_dice += dice_freq[4]
-
         return [score, scoring_dice]
 
     def update_gamestate(self, turn_score, turn_dice):
+        print(f"Turn score: {turn_score}.")
+        print(f"Dice left: {turn_dice}.")
+        self.scores[self.current_player] += turn_score
         self.prev_score = turn_score
         self.prev_dice_left = turn_dice
         self.turn_number += 1
@@ -134,9 +144,16 @@ class Game:
 
 
 # Start Game
-from example_player import ExamplePlayer
+from example_player import ExamplePlayer, HumanPlayer
 p1 = ExamplePlayer()
 p2 = ExamplePlayer()
 players = [p1, p2]
-game = Game(players)
-game.play_game()
+#print(game.roll_dice(6))
+def play_n_games(n):
+    results = [0 for i in range(n)]
+    for i in range(n):
+        game = Game(players)
+        results[i] = game.play_game()
+    print(results)
+
+play_n_games(3)
