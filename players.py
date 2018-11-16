@@ -6,7 +6,8 @@ class ExamplePlayer:
         pass
 
     def see_the_roll(self, roll):
-        print(f"Bot rolled {roll} on {len(roll)} dice.")
+        #print(f"Bot rolled {roll} on {len(roll)} dice.")
+        pass
 
     def turn_start(self, prev_score, prev_dice_left):
         #last_score = prev_turn[0]
@@ -15,7 +16,7 @@ class ExamplePlayer:
 
     def decide_move(self, turn_score, prev_roll_array):
         num_dice = len(prev_roll_array)
-        print(f"In a turn: {prev_roll_array}")
+        #print(f"In a turn: {prev_roll_array}")
         while True:
             return [random.getrandbits(1) for i in range(num_dice)]
 

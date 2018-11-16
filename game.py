@@ -2,6 +2,11 @@ from random import shuffle, randint
 import unittest
 import time
 
+PRINT = False
+
+def cprint(to_print):
+    if PRINT == True: print(to_print)
+
 class Game:
 
     GAME_END = 100000
@@ -23,12 +28,11 @@ class Game:
             self.play_turn(player)
             if self.is_game_over(): break
             self.current_player = self.next_player()
-            #time.sleep(1)
         ranking = self.calculate_ranking()
         return self.scores
 
     def play_turn(self, player):
-        print(f"******************* NEW TURN: *******************")
+        cprint(f"******************* NEW TURN: *******************")
         turn_score = 0
         turn_dice = 6
         player.update_state(self.players, self.scores, self.current_player, Game.GAME_END)
@@ -43,7 +47,7 @@ class Game:
         while True:
             # If a roll is a farkle, update state and end turn.
             if self.farkle(roll):
-                print("farkle!")
+                cprint("farkle!")
                 turn_score = 0
                 turn_dice = 6
                 self.update_gamestate(turn_score,turn_dice)
@@ -54,11 +58,11 @@ class Game:
             # Continue turn: score the selected dice and roll the rest.
             selected_dice = [a*b for a,b in zip(roll, move)]
             while 0 in selected_dice: selected_dice.remove(0)
-            print(f"{len(selected_dice)} Dice selected: {selected_dice}.")
+            cprint(f"{len(selected_dice)} Dice selected: {selected_dice}.")
 
             score_dice = self.get_score(selected_dice)
             if score_dice[0] == 0:
-                print("farkle!")
+                cprint("farkle!")
                 turn_score = 0
                 turn_dice = 6
                 self.update_gamestate(turn_score,turn_dice)
@@ -66,7 +70,7 @@ class Game:
 
             turn_score += score_dice[0]
             turn_dice -= score_dice[1]
-            print(f"Current turn score is {turn_score} with {turn_dice} dice remaining.")
+            cprint(f"Current turn score is {turn_score} with {turn_dice} dice remaining.")
 
             # Check if player decides to end turn.
             stop_or_continue = int(player.stop_or_continue())
@@ -75,7 +79,7 @@ class Game:
                 #turn_score += score_dice[0]
                 #turn_dice -= score_dice[1]
                 self.update_gamestate(turn_score,turn_dice)
-                print(f"PLAYER ENDS TURN with {turn_score} points and {turn_dice} dice remaining.")
+                cprint(f"PLAYER ENDS TURN with {turn_score} points and {turn_dice} dice remaining.")
                 break
 
 
@@ -84,7 +88,7 @@ class Game:
             roll = self.roll_dice(turn_dice)
             player.see_the_roll(roll)
 
-        print(f"Turn #{self.turn_number}: scores are {self.scores}.")
+        cprint(f"Turn #{self.turn_number}: scores are {self.scores}.")
 
     def add_player(self, player):
         self.players.append(player)
@@ -129,8 +133,8 @@ class Game:
         return [score, scoring_dice]
 
     def update_gamestate(self, turn_score, turn_dice):
-        print(f"Turn score: {turn_score}.")
-        print(f"Dice left: {turn_dice}.")
+        cprint(f"Turn score: {turn_score}.")
+        cprint(f"Dice left: {turn_dice}.")
         self.scores[self.current_player] += turn_score
         self.prev_score = turn_score
         self.prev_dice_left = turn_dice if turn_dice != 0 else 6
@@ -141,7 +145,7 @@ class Game:
         def sort(list):
             return sorted(range(len(list)), key=list.__getitem__, reverse = True)
         ranking = sort(self.scores)
-        print(f"Player {ranking[0]} is the winner with {self.scores[ranking[0]]} points!")
+        cprint(f"Player {ranking[0]} is the winner with {self.scores[ranking[0]]} points!")
         return ranking
 
     def is_game_over(self):
@@ -157,13 +161,15 @@ def main():
     p2 = ExamplePlayer()
     players = [p1, p2]
     def play_n_games(n):
+        start = time.time()
         results = [0 for i in range(n)]
         for i in range(n):
             game = Game(players)
             results[i] = game.play_game()
         print(results)
+        print(f'Total time: {round(time.time()-start, 2)} seconds')
 
-    play_n_games(1)
+    play_n_games(10)
 
 if __name__=='__main__':
     main()
